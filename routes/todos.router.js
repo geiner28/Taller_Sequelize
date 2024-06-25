@@ -8,7 +8,7 @@ const { col } = require('sequelize');
 router.get('/', async (req, res) => {
     try {
         const todos = await Todo.findAll();
-        res.render('todos/index', { todos, todo: null, errorMessage: null });
+        res.render('index', { todos, todo: null, errorMessage: null });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al obtener las tareas');
@@ -28,23 +28,23 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Obtener una tarea por su ID
-// Buscar una tarea por su ID (formulario)
+/// Obtener una tarea por su ID (formulario)
 router.post('/search', async (req, res) => {
     try {
         const { taskId } = req.body;
         const todo = await Todo.findByPk(taskId);
         if (!todo) {
             const todos = await Todo.findAll();
-            return res.render('todos/index', { todos, todo: null, errorMessage: 'Tarea no encontrada' });
+            return res.render('index', { todos, todo: null, errorMessage: 'Tarea no encontrada' });
         }
         const todos = await Todo.findAll();
-        res.render('todos/index', { todos, todo, errorMessage: null });
+        res.render('index', { todos, todo, errorMessage: null });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al buscar la tarea');
     }
 });
+
 
 
 // Actualizar una tarea

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="/tailwind.css">
+
+
+</head>
+<body class="bg-black text-white">
+    <div class="container mx-auto bg-blue p-4">
+        <h1 class="text-3xl font-bold mb-4">Todo List</h1>
+        <ul >
+            <% todos.forEach(function(todo) { %>
+            <li id="todo-<%= todo.id %>" class="todo-item bg-gray-800 rounded-lg p-4 mb-4">
+                <div class="flex items-center">
+                    <span class="text-lg"><%= todo.id %></span>
+                    <form action="/todospanel/<%= todo.id %>?_method=PUT" method="POST" class="flex-1 ml-4">
+                        <input type="text" name="title" value="<%= todo.title %>" class="p-2 mr-2 bg-gray-800 text-white rounded-lg outline-none">
+                        <input type="checkbox" name="completed" <%= todo.completed ? "checked" : "" %> class="mr-2">
+                        <button type="submit" class="btn-blue">Actualizar</button>
+                    </form>
+                    <form action="/todospanel/<%= todo.id %>?_method=DELETE" method="POST">
+                        <button type="submit" class="btn-blue ml-2">Eliminar</button>
+                    </form>
+                </div>
+            </li>
+            <% }); %>
+        </ul>
+        <form action="/todospanel" method="POST" class="mt-4">
+            <label for="title" class="mr-2">Titulo</label>
+            <input type="text" id="title" name="title" placeholder="Title" class="p-2 mr-2 bg-gray-800 text-white rounded-lg outline-none">
+            <label for="completed" class="mr-2">Completed</label>
+            <input type="checkbox" name="completed" id="completed" class="mr-2">
+            <button type="submit" class="btn-blue">Agregar Tarea</button>
+        </form>
+
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold mb-4">Buscar Tarea por ID</h1>
+            <form action="/todospanel/search" method="POST" class="flex mb-4">
+                <label for="taskId" class="mr-2">ID de la Tarea</label>
+                <input type="text" id="taskId" name="taskId" class="p-2 mr-2 bg-gray-800 text-white rounded-lg outline-none" placeholder="Enter Task ID">
+                <button type="submit" class="btn-blue">Buscar</button>
+            </form>
+    
+            <% if (errorMessage) { %>
+                <div class="error-message text-red-500 mb-4">
+                    <%= errorMessage %>
+                </div>
+            <% } %>
+
+            <% if (todo) { %>
+                <div id="todo-<%= todo.id %>" class="todo-item mt-4 bg-red-900 rounded-lg p-4">
+                    <h2 class="text-xl font-bold mb-2">Detalle de Tarea</h2>
+                    <form action="/todospanel/<%= todo.id %>?_method=PUT" method="POST" class="flex">
+                        <input type="text" name="title" value="<%= todo.title %>" class="p-2 mr-2 bg-gray-800 text-white rounded-lg outline-none">
+                        <input type="checkbox" name="completed" <%= todo.completed ? "checked" : "" %> class="mr-2">
+                        <button type="submit" class="btn-blue">Actualizar</button>
+                    </form>
+                    <form action="/todospanel/<%= todo.id %>?_method=DELETE" method="POST">
+                        <button type="submit" class="btn-blue ml-2">Eliminar</button>
+                    </form>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let scrollPosition = window.scrollY;
+
+            document.querySelectorAll('form[action^="/todospanel"][method="POST"]').forEach(form => {
+                form.addEventListener('submit', () => {
+                    localStorage.setItem('scrollPosition', window.scrollY);
+                });
+            });
+
+            if (localStorage.getItem('scrollPosition')) {
+                scrollPosition = localStorage.getItem('scrollPosition');
+                window.scrollTo(0, scrollPosition);
+                localStorage.removeItem('scrollPosition');
+            }
+        });
+    </script>
+</body>
+</html>
