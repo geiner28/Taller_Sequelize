@@ -8,7 +8,7 @@
     "start-dev": "npx nodemon index.js",
     "debug": "node --inspect index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-   "build:tailwind": "tailwindcss build src/styles.css -o public/tailwind.css"
+   "build:tailwind": "tailwindcss build src/styles/tailwind.css -o public/styles/tailwind.css"
   },
   "keywords": [
     "api",

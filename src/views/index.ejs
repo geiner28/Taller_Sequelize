@@ -4,84 +4,186 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo List</title>
-    <link rel="stylesheet" href="/tailwind.css">
-
-
+    <link href="/styles/tailwind.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/custom.css">
+    <style>
+        
+    </style>
 </head>
-<body class="bg-black text-white">
-    <div class="container mx-auto bg-blue p-4">
-        <h1 class="text-3xl font-bold mb-4">Todo List</h1>
-        <ul >
-            <% todos.forEach(function(todo) { %>
-            <li id="todo-<%= todo.id %>" class="todo-item bg-gray-800 rounded-lg p-4 mb-4">
-                <div class="flex items-center">
-                    <span class="text-lg"><%= todo.id %></span>
-                    <form action="/todospanel/<%= todo.id %>?_method=PUT" method="POST" class="flex-1 ml-4">
-                        <input type="text" name="title" value="<%= todo.title %>" class="p-2 mr-2 bg-gray-800 text-white rounded-lg outline-none">
-                        <input type="checkbox" name="completed" <%= todo.completed ? "checked" : "" %> class="mr-2">
-                        <button type="submit" class="btn-blue">Actualizar</button>
-                    </form>
-                    <form action="/todospanel/<%= todo.id %>?_method=DELETE" method="POST">
-                        <button type="submit" class="btn-blue ml-2">Eliminar</button>
-                    </form>
-                </div>
-            </li>
-            <% }); %>
-        </ul>
-        <form action="/todospanel" method="POST" class="mt-4">
-            <label for="title" class="mr-2">Titulo</label>
-            <input type="text" id="title" name="title" placeholder="Title" class="p-2 mr-2 bg-gray-800 text-white rounded-lg outline-none">
-            <label for="completed" class="mr-2">Completed</label>
-            <input type="checkbox" name="completed" id="completed" class="mr-2">
-            <button type="submit" class="btn-blue">Agregar Tarea</button>
-        </form>
+<body class="bg-gradient-to-r text-white">
 
-        <div class="container mx-auto">
-            <h1 class="text-3xl font-bold mb-4">Buscar Tarea por ID</h1>
-            <form action="/todospanel/search" method="POST" class="flex mb-4">
-                <label for="taskId" class="mr-2">ID de la Tarea</label>
-                <input type="text" id="taskId" name="taskId" class="p-2 mr-2 bg-gray-800 text-white rounded-lg outline-none" placeholder="Enter Task ID">
-                <button type="submit" class="btn-blue">Buscar</button>
-            </form>
+    <div class="containerform">
+        <form action="/todospanel" method="POST">
+            <label for="title">Título:</label>
+            <input type="text" id="title" name="title" placeholder="Título" required>
     
-            <% if (errorMessage) { %>
-                <div class="error-message text-red-500 mb-4">
-                    <%= errorMessage %>
-                </div>
-            <% } %>
-
-            <% if (todo) { %>
-                <div id="todo-<%= todo.id %>" class="todo-item mt-4 bg-red-900 rounded-lg p-4">
-                    <h2 class="text-xl font-bold mb-2">Detalle de Tarea</h2>
-                    <form action="/todospanel/<%= todo.id %>?_method=PUT" method="POST" class="flex">
-                        <input type="text" name="title" value="<%= todo.title %>" class="p-2 mr-2 bg-gray-800 text-white rounded-lg outline-none">
-                        <input type="checkbox" name="completed" <%= todo.completed ? "checked" : "" %> class="mr-2">
-                        <button type="submit" class="btn-blue">Actualizar</button>
-                    </form>
-                    <form action="/todospanel/<%= todo.id %>?_method=DELETE" method="POST">
-                        <button type="submit" class="btn-blue ml-2">Eliminar</button>
-                    </form>
-                </div>
-            <% } %>
-        </div>
+            <label for="completed">Completado:</label>
+            <input type="checkbox" name="completed" id="completed">
+    
+            <button type="submit" id="addButton" >Agregar Tarea</button>
+        </form>
     </div>
 
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-4">Todo Lista</h1>
+
+        <div class="flex mb-8">
+            <div class="estadostodo">
+                <h2 class="text-2xl font-bold mb-4">Pendientes</h2>
+                <ul id="pendingTodos" class="todos-list">
+                    <% todos.forEach(function(todo) { %>
+                        <% if (!todo.completed) { %>
+                            <li id="todo-<%= todo.id %>" class="todo-item">
+                                <div>
+                                    
+                                    <form action="/todospanel/<%= todo.id %>?_method=PUT" method="POST" class="todo-form">
+                                        <div class="divid"> 
+                                                 <span class="spanid"><%= todo.id %></span>
+                                        <div class="input-group">
+                                         <h5 class="h5">Nombre</h5>
+                                            <input type="text" name="title" value="<%= todo.title %>" onchange="enableUpdateButton(this)" required>
+                                            <label class="label-checkbox cursor-pointer">
+                                                <h5 id="h5estado">Estado</h5>
+                                                <input type="checkbox" name="completed" <%= todo.completed ? 'checked' : '' %> onchange="enableUpdateButton(this)">
+                                                <span class="checkbox-custom"></span>
+                                                   <h5 class="h5completed">incompleted</h5>
+                                            </label>
+                
+                                        </div>
+                
+                                        </div>
+                                        <div class="button-group mt-2">
+                                            <button type="submit" class="btn-blue" disabled><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                              </svg>
+                                              </button>
+                                                </form>
+                                              
+                                            <form id="FORM" action="/todospanel/<%= todo.id %>?_method=DELETE" method="POST">
+                                                <button type="submit" class="btn-blue ml-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                  </svg>
+                                                  </button>
+                                            </form>
+                                        </div>
+                                  
+                                </div>
+                            </li>
+                        <% } %>
+                    <% }); %>
+                </ul>
+            </div>
+
+            <div class="estadostodo">
+                <h2 class="text-2xl font-bold mb-4">Completados</h2>
+                <ul id="completedTodos" class="todos-list">
+                    <% todos.forEach(function(todo) { %>
+                        <% if (todo.completed) { %>
+                            <li id="todo-<%= todo.id %>" class="todo-item">
+                                <div>
+                                    
+                                    <form action="/todospanel/<%= todo.id %>?_method=PUT" method="POST" class="todo-form">
+                                        <div class="divid"> 
+                                                 <span class="spanid"><%= todo.id %></span>
+                                        <div class="input-group">
+                                         <h5 class="h5">Nombre</h5>
+                                            <input type="text" name="title" value="<%= todo.title %>" onchange="enableUpdateButton(this)" required>
+                                            <label class="label-checkbox cursor-pointer">
+                                                <h5 id="h5estado">Estado</h5>
+                                                <input type="checkbox" name="completed" <%= todo.completed ? 'checked' : '' %> onchange="enableUpdateButton(this)">
+                                                <span class="checkbox-custom"></span>
+                                                   <h5 class="h5completed">completed</h5>
+                                            </label>
+                
+                                        </div>
+                
+                                        </div>
+                                        <div class="button-group mt-2">
+                                            <button type="submit" class="btn-blue" disabled><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                              </svg>
+                                              </button>
+                                                </form>
+                                              
+                                            <form id="FORM" action="/todospanel/<%= todo.id %>?_method=DELETE" method="POST">
+                                                <button type="submit" class="btn-blue ml-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                  </svg>
+                                                  </button>
+                                            </form>
+                                        </div>
+                                  
+                                </div>
+                            </li>
+                        <% } %>
+                    <% }); %>
+                </ul>
+            </div>
+        </div>
+
+        <div class="container2 mx-auto mt-4">
+            <div class="buscarform2">
+                <h1>Buscar Tarea por ID</h1>
+                <form action="/todospanel/search" method="POST" class="flex2 mb-4">
+                    <label for="taskId2">ID de la Tarea:</label>
+                    <input type="text" id="taskId2" name="taskId" class="rounded-lg outline-none" placeholder="Ingresa el ID de la Tarea">
+                    <button type="submit" class="btn-blue2">Buscar</button>
+                </form>
+    
+                <% if (errorMessage) { %>
+                    <div class="error-message2 mb-4">
+                        <%= errorMessage %>
+                    </div>
+                <% } %>
+    
+                <% if (todo) { %>
+                    <div id="todo-<%= todo.id %>" class="todo-item2 mt-4">
+                        <h2>Detalle de Tarea</h2>
+                        <form action="/todospanel/<%= todo.id %>?_method=PUT" method="POST" class="todo-form2">
+                            <div class="input-group2">
+                                <span><%= todo.id %></span>
+                                <input type="text" name="title" value="<%= todo.title %>" class="rounded-lg outline-none" onchange="enableUpdateButton(this)" required>
+                                <label class="label-checkbox2 cursor-pointer">
+                                    <input type="checkbox" name="completed" <%= todo.completed ? 'checked' : '' %> onchange="enableUpdateButton(this)">
+                                    <% if (todo.completed) { %>
+                                        <span class="ml-2 text-green-500">Completada</span>
+                                    <% } else { %>
+                                        <span class="ml-2 text-red-500">Incompleta</span>
+                                    <% } %>
+                                </label>
+                            </div>
+                            <div class="button-group2">
+                                <button type="submit" class="btn-blue2" disabled>Actualizar</button>
+                                </form>
+                                <br>
+                                <form action="/todospanel/<%= todo.id %>?_method=DELETE" method="POST">
+                                    <button type="submit" class="btn-blue2">Eliminar</button>
+                                </form>
+                            </div>
+                        
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let scrollPosition = window.scrollY;
+        function enableUpdateButton(element) {
+            const updateButton = element.closest('form').querySelector('button[type="submit"]');
+            updateButton.disabled = false;
+        }
 
-            document.querySelectorAll('form[action^="/todospanel"][method="POST"]').forEach(form => {
-                form.addEventListener('submit', () => {
-                    localStorage.setItem('scrollPosition', window.scrollY);
-                });
-            });
+        function enableAddButton() {
+            const titleInput = document.getElementById('title');
+            const completedCheckbox = document.getElementById('completed');
+            const addButton = document.getElementById('addButton');
 
-            if (localStorage.getItem('scrollPosition')) {
-                scrollPosition = localStorage.getItem('scrollPosition');
-                window.scrollTo(0, scrollPosition);
-                localStorage.removeItem('scrollPosition');
+            if (titleInput.value.trim() !== '' || completedCheckbox.checked) {
+                addButton.disabled = false;
+            } else {
+                addButton.disabled = true;
             }
-        });
+        }
     </script>
 </body>
 </html>
